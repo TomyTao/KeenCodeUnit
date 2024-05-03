@@ -254,7 +254,10 @@ private extension KeenCodeUnit {
     func createSubviews() {
         textFiled.frame = bounds
         textFiled.backgroundColor = .clear
+
+        //textFiled不显示，所以设置这个不影响任何视觉效果，但是可以防止用户切换输入法，防止使用拼音输入法
         textFiled.isSecureTextEntry = true
+        
         backgroundColor = attributes.viewBackColor
         for idx in 0..<attributes.count {
             if attributes.style == .followborder { attributes.itemSpacing = 0 }
@@ -401,6 +404,9 @@ private extension KeenCodeUnit {
     
     
     @objc func textChange(_ textField: UITextField) {
+        //禁止输入空格
+        textField.text = textField.text?.replacingOccurrences(of: " ", with: "")
+        
         var code = textField.text ?? ""
         if code.count > attributes.count {
             let substring = textField.text!.prefix(attributes.count)
