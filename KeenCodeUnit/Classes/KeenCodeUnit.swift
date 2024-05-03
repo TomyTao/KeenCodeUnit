@@ -102,11 +102,20 @@ public extension KeenCodeUnitDelegate {
 }
 
 //MARK: - KeenCodeUnit 类
-public class KeenCodeUnit: UIView {
+public class KeenCodeUnit: UIView,UITextFieldDelegate {
     
     /// 代理
     public weak var delegate: KeenCodeUnitDelegate?
-    
+    /// 只能输入数字
+    public var numberOnly: Bool = false {
+        didSet {
+            if numberOnly == true {
+                textFiled.keyboardType = .numberPad
+            }else{
+                textFiled.keyboardType = .namePhonePad
+            }
+        }
+    }
     /// 光标
     private lazy var cursors: [CAShapeLayer] = []
     /// 下划线、边框
@@ -134,6 +143,10 @@ public class KeenCodeUnit: UIView {
         if attributes.isAutoFillin {
             if #available(iOS 12.0, *) {
                 view.textContentType =  .oneTimeCode
+            }
+        }else{
+            if #available(iOS 10.0, *) {
+                view.keyboardType(.namePhonePad)
             }
         }
         view.addTarget(self, action: #selector(textChange(_:)), for: .editingChanged)
@@ -231,6 +244,7 @@ public class KeenCodeUnit: UIView {
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
 }
 
 //MARK: - 布局|配置
@@ -239,6 +253,8 @@ private extension KeenCodeUnit {
     /// 布局控件
     func createSubviews() {
         textFiled.frame = bounds
+        textFiled.backgroundColor = .clear
+        textFiled.isSecureTextEntry = true
         backgroundColor = attributes.viewBackColor
         for idx in 0..<attributes.count {
             if attributes.style == .followborder { attributes.itemSpacing = 0 }
@@ -381,6 +397,8 @@ private extension KeenCodeUnit {
             cursors.append(cursor)
         }
     }
+    
+    
     
     @objc func textChange(_ textField: UITextField) {
         var code = textField.text ?? ""
